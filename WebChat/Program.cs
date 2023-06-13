@@ -12,7 +12,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ChatContext>(x => x.UseSqlite("Data Source=app-data.db"));
 
 builder.Services.AddMvc();
-builder.Services.AddAutoMapper(typeof(MappingUser), typeof(ChatroomMapper), typeof(MessageMapper), typeof(UserMapper));
+builder.Services.AddAutoMapper(typeof(MappingUser), typeof(MappingChatroom), typeof(MappingMessage));
 
 builder.Services.AddMediatR(mediatr =>
 {

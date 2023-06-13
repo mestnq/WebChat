@@ -8,6 +8,22 @@ public class Repository<T> : IRepository<T> where T: BaseModel
     private readonly ChatContext DbContext;
 
     protected Repository(ChatContext dbContext) => DbContext = dbContext;
+
+    /// <summary>
+    /// Проверяет существование сущности в БД
+    /// </summary>
+    /// <returns>Вернет true, если какой-то сущности нет в БД</returns>
+    public bool ContainsEntities(params long[] args)
+    {
+        foreach (var entityId in args)
+        {
+            if (GetById(entityId).Result is null)
+                return true;
+        }
+
+        return false;
+    }
+    
     
     public async Task<T?> Add(T entity)
     {

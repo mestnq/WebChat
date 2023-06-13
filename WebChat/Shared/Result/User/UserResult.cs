@@ -1,6 +1,6 @@
 using WebChat.Data.Entities.Dtos;
 
-namespace WebChat.Shared.Result;
+namespace WebChat.Shared.Result.User;
 
 public record UserResult
 {

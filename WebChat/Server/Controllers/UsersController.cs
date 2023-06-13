@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using WebChat.Shared.Requests;
 using WebChat.Shared.Requests.User;
 using WebChat.Shared.Result;
+using WebChat.Shared.Result.User;
 
 namespace WebChat.Server.Controllers;
 
