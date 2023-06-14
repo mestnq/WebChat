@@ -87,3 +87,4 @@
 /Users/kseniya/RiderProjects/WebChat/WebChat/obj/Debug/net7.0/WebChat.pdb
 /Users/kseniya/RiderProjects/WebChat/WebChat/obj/Debug/net7.0/WebChat.genruntimeconfig.cache
 /Users/kseniya/RiderProjects/WebChat/WebChat/obj/Debug/net7.0/ref/WebChat.dll
+/Users/kseniya/RiderProjects/WebChat/WebChat/bin/Debug/net7.0/WebChat.staticwebassets.runtime.json
