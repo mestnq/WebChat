@@ -1,9 +1,6 @@
 using MediatR;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using WebChat.Shared.Requests;
 using WebChat.Shared.Requests.User;
-using WebChat.Shared.Result;
 using WebChat.Shared.Result.User;
 
 namespace WebChat.Server.Controllers;
@@ -44,10 +41,10 @@ public class UsersController : ControllerBase
     
     // POST: api/users/current/change-nickname
     [HttpPost("users/current/change-nickname")]
-    public IActionResult ChangeNicknameUser([FromQuery] UpdateUserRequest updateUserRequest)
+    public IActionResult ChangeNicknameUser([FromBody] UpdateUserRequest updateUserRequest)
     {
         var e = _mediator.Send(updateUserRequest);
-        return e?.Result?.User is null ? NotFound() : Ok(e.Result); //TODO: подумать про "?", а то расставлять их в час ночи не айс
+        return e?.Result?.User is null ? NotFound() : Ok(e.Result);
     }
     
     // DELETE: api/users/current

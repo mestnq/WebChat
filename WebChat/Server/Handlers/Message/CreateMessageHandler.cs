@@ -20,12 +20,11 @@ public class CreateMessageHandler : IRequestHandler<CreateMessageRequest, Messag
     
     public async Task<MessageResult> Handle(CreateMessageRequest request, CancellationToken cancellationToken)
     {
-        var message = await _messageService.CreateMessage(_mapper.Map<Data.Entities.Models.Message>(request.Message));
+        var message = await _messageService.CreateMessage(request.AuthorId, request.ChatId, request.Text);
         
         return new MessageResult()
         {
             Message = _mapper.Map<MessageDto>(message)
         };
-        
     }
 }

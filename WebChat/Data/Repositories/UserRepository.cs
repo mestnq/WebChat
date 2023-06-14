@@ -12,7 +12,6 @@ public class UserRepository: Repository<User>
     public async ValueTask<IReadOnlyCollection<User>> GetUsers()
     {
         return await GetAll()
-            //.Include()
             .ToListAsync(); 
     }
 

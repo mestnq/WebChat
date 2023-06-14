@@ -7,32 +7,24 @@ using WebChat.Shared.Result.Chatroom;
 
 namespace WebChat.Server.Handlers.Chatrooms;
 
-public class GetChatroomsHandler : IRequestHandler<GetChatroomsRequest, GetChatroomsResult>
+public class GetUserChatroomsHandler : IRequestHandler<GetUserChatroomsRequest, GetUserChatroomsResult>
 {
     private readonly IMapper _mapper;
     private readonly ChatroomService _chatroomService;
 
-    public GetChatroomsHandler(ChatroomService chatroomService, IMapper mapper)
+    public GetUserChatroomsHandler(ChatroomService chatroomService, IMapper mapper)
     {
         _chatroomService = chatroomService;
         _mapper = mapper;
     }
 
-    public async Task<GetChatroomsResult> Handle(GetChatroomsRequest request, CancellationToken cancellationToken)
+    public async Task<GetUserChatroomsResult> Handle(GetUserChatroomsRequest request, CancellationToken cancellationToken)
     {
-        //todo:
-        var chatroom = await _chatroomService.GetAllChatroom(request.UserId);
+        var userChatrooms = await _chatroomService.GetUserChatrooms(request.UserId);
         
-        return new GetChatroomsResult()
+        return new GetUserChatroomsResult()
         {
-            Chatrooms= _mapper.Map<ChatroomDto>(chatroom)
+            Chatrooms = _mapper.Map<ICollection<ChatroomDto>>(userChatrooms)
         };
-        //
-        // var users = await _userService.GetAllUser();
-        //
-        // return new GetUsersResult()
-        // {
-        //     Users = _mapper.Map<ICollection<UserDto>>(users)
-        // };
     }
 }

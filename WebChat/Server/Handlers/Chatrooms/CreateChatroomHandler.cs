@@ -3,9 +3,7 @@ using MediatR;
 using WebChat.Data.Entities.Dtos;
 using WebChat.Server.Services;
 using WebChat.Shared.Requests.Chatroom;
-using WebChat.Shared.Requests.Message;
 using WebChat.Shared.Result.Chatroom;
-using WebChat.Shared.Result.Message;
 
 namespace WebChat.Server.Handlers.Chatrooms;
 
@@ -22,7 +20,7 @@ public class CreateChatroomHandler : IRequestHandler<CreateChatroomRequest, Chat
 
     public async Task<ChatroomResult> Handle(CreateChatroomRequest request, CancellationToken cancellationToken)
     {
-        var chatroom = await _chatroomService.CreateChatroom(_mapper.Map<Data.Entities.Models.Chatroom>(request.Chatroom));
+        var chatroom = await _chatroomService.CreateChatroom(request.Name, request.UsersId);
         
         return new ChatroomResult()
         {

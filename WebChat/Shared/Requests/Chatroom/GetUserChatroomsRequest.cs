@@ -4,7 +4,7 @@ using WebChat.Shared.Result.Chatroom;
 
 namespace WebChat.Shared.Requests.Chatroom;
 
-public record GetChatroomsRequest : IRequest<GetChatroomsResult>
+public record GetUserChatroomsRequest : IRequest<GetUserChatroomsResult>
 {
     public required long UserId { get; init; }
 }

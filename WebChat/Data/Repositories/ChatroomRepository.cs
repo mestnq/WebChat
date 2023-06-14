@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using WebChat.Data.Entities.Dtos;
 using WebChat.Data.Entities.Models;
 
@@ -10,26 +11,31 @@ public class ChatroomRepository: Repository<Chatroom>
         
     public async ValueTask<Chatroom?> GetChatroom(long id) => await GetById(id);
 
-    //todo:
-    // public async ValueTask<Chatroom?> GetMessagesInChatroom(long id)
-    // {
-    //     var messagesId = GetChatroom(id).Result?.MessagesId;
-    //     return await messagesId.Select(x => get)
-    // }
+    private async Task<Chatroom?> GetChatroomWithInclude(long id)
+    {
+       return await Set
+            .Include(c => c.Messages.Where(m => !m.IsDeleted))
+            .Include(c => c.Users.Where(user => user != null && !user.IsDeleted))
+            .SingleOrDefaultAsync(c => c.Id == id && !c.IsDeleted);
+    }
+    
+    public async Task<IReadOnlyCollection<Message?>?> GetMessagesInChatroom(long id)
+    {
+        var includeChatroom = await GetChatroomWithInclude(id);
+        return includeChatroom?.Messages.ToList();
+    }
+    
+    public async Task<List<Chatroom>> GetUserChatrooms(long userId)
+    {
+        return await GetAll()
+            .Include(c => c.Users)
+            .Where(chat => chat.Users.Any(u => u != null && u.Id == userId))
+            .ToListAsync();;
+    }
+    
     public async ValueTask<Chatroom?> AddChatroom(Chatroom chatroom) => await Add(chatroom);
     
-    public async ValueTask<IReadOnlyCollection<Chatroom>> GetChatrooms(long userId)
-    {
-        //todo: каждый чат содержит юзера. Нужно достать из чатов нашего юзера, и из этого всего получить список.
-        // foreach (var chatroom in GetAll())
-        // {
-        //     var enumerable = chatroom.UsersId.Where(id => userId == id);
-        // }
-        //
-        // return await GetAll().ElementType;
-        
-        // return await GetAll().Where(i => i.UsersId.)
-        //     //.Include()
-        //     .ToListAsync(); 
-    }
-}
+    public async ValueTask<Chatroom?> UpdateChatroom(Chatroom chatroom) => await Update(chatroom);
+
+    public async ValueTask<bool> DeleteChatroom(long id) => await Delete(id);
+} 

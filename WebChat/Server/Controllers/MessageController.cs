@@ -17,7 +17,7 @@ public class MessageController : ControllerBase
     
     // POST: api/messages/add
     [HttpPost("messages/add")]
-    public IActionResult CreateMessage([FromQuery] CreateMessageRequest createUserRequest)
+    public IActionResult CreateMessage([FromBody] CreateMessageRequest createUserRequest)
     {
         var e = _mediator.Send(createUserRequest);
         return e?.Result?.Message is null ? Conflict() : Ok(e.Result);

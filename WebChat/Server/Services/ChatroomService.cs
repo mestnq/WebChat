@@ -1,4 +1,3 @@
-using WebChat.Data.Entities.Dtos;
 using WebChat.Data.Entities.Models;
 using WebChat.Data.Repositories;
 
@@ -7,27 +6,65 @@ namespace WebChat.Server.Services;
 public class ChatroomService : IService
 {
     private readonly ChatroomRepository _chatroomRepository;
+    private readonly UserRepository _userRepository;
 
-    public ChatroomService(ChatroomRepository chatroomRepository)
+    public ChatroomService(ChatroomRepository chatroomRepository, UserRepository userRepository)
     {
         _chatroomRepository = chatroomRepository;
+        _userRepository = userRepository;
     }
     
-    public async Task<Chatroom?> CreateChatroom(Chatroom chatroom)
+    public async Task<Chatroom?> CreateChatroom(string name, long[] usersId)
     {
-        var count= chatroom.UsersId.Count(x => _chatroomRepository.ContainsEntities(x));
+        var users = usersId.Select(id => _userRepository.GetUser(id).Result).ToList();
 
-        return count == 0 && _chatroomRepository.GetChatroom(chatroom.Id).Result is null ? await _chatroomRepository.AddChatroom(chatroom) : null;
-    }
-    
-    public async Task<Chatroom?> GetMessagesInChatroom(long chatroomId)
-    {
-        //todo:
+        if (users.Count > 0 && users.Any(u => u is not null))
+        {
+            var chatroom = new Chatroom()
+            {
+                Name = name,
+                Messages = new List<Message>(),
+                Users = users
+            };
+            
+            return await _chatroomRepository.AddChatroom(chatroom);
+        }
+        
         return null;
     }
     
-    public async Task<IReadOnlyCollection<Chatroom>> GetAllChatroom(long userId)
+    public async Task<IReadOnlyCollection<Message?>?> GetMessagesInChatroom(long chatroomId)
     {
-        return await _chatroomRepository.GetChatrooms(userId);
+        if (_chatroomRepository.GetChatroom(chatroomId).Result is not null)
+        {
+            return await _chatroomRepository.GetMessagesInChatroom(chatroomId);
+        }
+        
+        return null;
+    }
+    
+    public async Task<IReadOnlyCollection<Chatroom?>?> GetUserChatrooms(long userId)
+    {
+        if (_userRepository.GetUser(userId).Result is not null)
+        {
+            return await _chatroomRepository.GetUserChatrooms(userId);
+        }
+        
+        return null;
+    }
+
+    public async Task<Chatroom?> UpdateChatroom(Chatroom chatroom)
+    {
+        return await _chatroomRepository.UpdateChatroom(chatroom);
+    }
+    
+    public async Task<Chatroom?> GetChatroomById(long chatroomId)
+    {
+        return await _chatroomRepository.GetChatroom(chatroomId);
+    }
+
+    public async Task<bool> DeleteChatroom(long chatroomId)
+    {
+        return await _chatroomRepository.DeleteChatroom(chatroomId);
     }
 }

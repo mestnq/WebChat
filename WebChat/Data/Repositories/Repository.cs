@@ -9,21 +9,22 @@ public class Repository<T> : IRepository<T> where T: BaseModel
 
     protected Repository(ChatContext dbContext) => DbContext = dbContext;
 
-    /// <summary>
-    /// Проверяет существование сущности в БД
-    /// </summary>
-    /// <returns>Вернет true, если какой-то сущности нет в БД</returns>
-    public bool ContainsEntities(params long[] args)
-    {
-        foreach (var entityId in args)
-        {
-            if (GetById(entityId).Result is null)
-                return true;
-        }
+    // /// <summary>
+    // /// Проверяет существование сущности в БД
+    // /// </summary>
+    // /// <returns>Вернет true, если какой-то сущности нет в БД</returns>
+    // public bool NotContainsEntities(params long[] args)
+    // {
+    //     foreach (var entityId in args)
+    //     {
+    //         if (GetById(entityId).Result is null)
+    //             return true;
+    //     }
+    //
+    //     return false;
+    // }
 
-        return false;
-    }
-    
+    public DbSet<T> Set => DbContext.Set<T>();
     
     public async Task<T?> Add(T entity)
     {
@@ -52,11 +53,11 @@ public class Repository<T> : IRepository<T> where T: BaseModel
 
     public async Task<T?> GetById(long id)
     {
-        return await DbContext.Set<T>().SingleOrDefaultAsync(entity => entity.Id == id && !entity.IsDeleted);
+        return await Set.SingleOrDefaultAsync(entity => entity.Id == id && !entity.IsDeleted);
     }
 
     public IQueryable<T> GetAll()
     {
-        return DbContext.Set<T>().AsNoTracking().Where(entity => !entity.IsDeleted);
+        return Set.AsNoTracking().Where(entity => !entity.IsDeleted);
     }
 }

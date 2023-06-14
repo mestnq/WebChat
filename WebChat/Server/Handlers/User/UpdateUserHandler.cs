@@ -24,7 +24,7 @@ public class UpdateUserHandler : IRequestHandler<UpdateUserRequest, UserResult?>
         if (user is null)
             return null;
         
-        user.Nickname = request.nickame;
+        user.Nickname = request.Nickname;
         var updateUser = await _userService.UpdateUser(user);
         
         return new UserResult()

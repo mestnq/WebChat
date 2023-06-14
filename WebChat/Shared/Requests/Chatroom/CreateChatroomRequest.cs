@@ -6,5 +6,6 @@ namespace WebChat.Shared.Requests.Chatroom;
 
 public record CreateChatroomRequest : IRequest<ChatroomResult>
 {
-    public required ChatroomDto Chatroom { get; set; }
+    public required string Name { get; set; }
+    public required long[] UsersId { get; set; }
 }

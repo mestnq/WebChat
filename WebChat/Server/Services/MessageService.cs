@@ -6,16 +6,33 @@ namespace WebChat.Server.Services;
 public class MessageService : IService
 {
     private readonly MessageRepository _messageRepository;
+    private readonly ChatroomRepository _chatroomRepository;
+    private readonly UserRepository _userRepository;
 
-    public MessageService(MessageRepository messageRepository)
+    public MessageService(MessageRepository messageRepository, ChatroomRepository chatroomRepository, UserRepository userRepository)
     {
         _messageRepository = messageRepository;
+        _chatroomRepository = chatroomRepository;
+        _userRepository = userRepository;
     }
     
-    public async Task<Message?> CreateMessage(Message message)
+    public async Task<Message?> CreateMessage(long authorId, long chatId, string text)
     {
-        var foundEntities = _messageRepository.ContainsEntities(message.ChatroomId, message.UserId);
+        var chatroom = _chatroomRepository.GetChatroom(chatId).Result;
+        var user = _userRepository.GetUser(authorId).Result;
+
+        if (chatroom is not null && user is not null)
+        {
+            var message = new Message
+            {
+                MessageText = text,
+                User = user,
+                ChatroomId = chatroom.Id
+            };
+
+            return await _messageRepository.AddMessage(message);
+        }
         
-        return !foundEntities && _messageRepository.GetMessage(message.Id).Result is null ? await _messageRepository.AddMessage(message) : null;
+        return null;
     }
 }

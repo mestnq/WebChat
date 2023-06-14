@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebChat.Data.Entities.Models;
 
@@ -10,9 +11,11 @@ using WebChat.Data.Entities.Models;
 namespace WebChat.Migrations
 {
     [DbContext(typeof(ChatContext))]
-    partial class ChatContextModelSnapshot : ModelSnapshot
+    [Migration("20230614080951_ChangesCollections")]
+    partial class ChangesCollections
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.0-preview.4.23259.3");
@@ -32,7 +35,7 @@ namespace WebChat.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Chatroom", (string)null);
+                    b.ToTable("Chatroom");
                 });
 
             modelBuilder.Entity("WebChat.Data.Entities.Models.Message", b =>
@@ -60,7 +63,7 @@ namespace WebChat.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Messages", (string)null);
+                    b.ToTable("Messages");
                 });
 
             modelBuilder.Entity("WebChat.Data.Entities.Models.User", b =>
@@ -91,7 +94,7 @@ namespace WebChat.Migrations
 
                     b.HasIndex("ChatroomId");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("WebChat.Data.Entities.Models.Message", b =>

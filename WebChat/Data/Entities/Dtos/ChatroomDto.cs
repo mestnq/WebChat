@@ -3,6 +3,6 @@ namespace WebChat.Data.Entities.Dtos;
 public class ChatroomDto : BaseDto
 {
     public string Name { get; set; }
-    public ICollection<long>? MessagesId { get; set; } = new List<long>();
-    public ICollection<long>? UsersId { get; set; } = new List<long>();
+    public ICollection<MessageDto>? Messages { get; set; } = new List<MessageDto>();
+    public ICollection<UserDto>? Users { get; set; } = new List<UserDto>();
 }
