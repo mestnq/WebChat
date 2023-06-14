@@ -1,59 +1,90 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using WebChat.Shared.Requests.Chatroom;
 
 namespace WebChat.Server.Controllers;
 
-[ApiController]
-[Route("[controller]")]
-public class ChatroomController : ControllerBase
+public class ChatroomController : Hub
 {
     // обновление названия чата)
     
     private readonly IMediator _mediator;
+    private readonly IHubContext<ChatroomController> _hubContext;
 
-    public ChatroomController(IMediator mediator)
+    public ChatroomController(IMediator mediator, IHubContext<ChatroomController> hubContext)
     {
         _mediator = mediator;
+        _hubContext = hubContext;
     }
     
     // POST: api/chatrooms/add
-    [HttpPost("chatrooms/add")]
-    public IActionResult CreateChatroom([FromBody] CreateChatroomRequest createChatroomRequest)
+    public async Task CreateChatroom(CreateChatroomRequest createChatroomRequest)
     {
-        var e = _mediator.Send(createChatroomRequest);
-        return e?.Result?.Chatroom is null ? Conflict() : Ok(e.Result);
+        var e = await _mediator.Send(createChatroomRequest);
+        if (e?.Chatroom is null)
+        {
+            await _hubContext.Clients.All.SendAsync("ChatroomConflicted");
+        }
+        else
+        {
+            await _hubContext.Clients.All.SendAsync("CreateChatroom", e);
+        }
     }
     
     // GET: api/chatrooms/current/messages
-    [HttpGet("chatrooms/current/messages")]
-    public IActionResult GetMessagesInChatroom([FromQuery] GetMessagesInChatroomRequest getMessagesInChatroomRequest)
+    public async Task GetMessagesInChatroom(GetMessagesInChatroomRequest getMessagesInChatroomRequest)
     {
-        var e = _mediator.Send(getMessagesInChatroomRequest);
-        return e?.Result?.Messages.Count == 0 ? NotFound() : Ok(e?.Result?.Messages);
+        var e = await _mediator.Send(getMessagesInChatroomRequest);
+        if (e?.Messages is null)
+        {
+            await _hubContext.Clients.All.SendAsync("MessagesNotFound", getMessagesInChatroomRequest);
+        }
+        else
+        {
+            await _hubContext.Clients.All.SendAsync("GetMessagesInChatroom", e);
+        }
     }
     
     // GET: api/chatrooms/current/user
-    [HttpGet("chatrooms/current/user")]
-    public IActionResult GetUserChatrooms([FromQuery] GetUserChatroomsRequest getUserChatroomsRequest)
+    public async Task GetUserChatrooms([FromQuery] GetUserChatroomsRequest getUserChatroomsRequest)
     {
-        var e = _mediator.Send(getUserChatroomsRequest);
-        return e?.Result.Chatrooms.Count == 0 ? NotFound() : Ok(e?.Result);    
+        var e = await _mediator.Send(getUserChatroomsRequest);
+        if (e?.Chatrooms is null)
+        {
+            await _hubContext.Clients.All.SendAsync("UserChatroomsNotFound", getUserChatroomsRequest);
+        }
+        else
+        {
+            await _hubContext.Clients.All.SendAsync("GetUserChatrooms", e);
+        }   
     }
     
     // POST: api/chatrooms/current/change-name
-    [HttpPost("chatrooms/current/change-name")]
-    public IActionResult ChangeNicknameUser([FromBody] UpdateChatroomRequest updateUserRequest)
+    public async Task ChangeNicknameUser(UpdateChatroomRequest updateUserRequest)
     {
-        var e = _mediator.Send(updateUserRequest);
-        return e.Result?.Chatroom is null ? NotFound() : Ok(e.Result);
+        var e = await _mediator.Send(updateUserRequest);
+        if (e?.Chatroom is null)
+        {
+            await _hubContext.Clients.All.SendAsync("ChangeNicknameUserDenied", updateUserRequest);
+        }
+        else
+        {
+            await _hubContext.Clients.All.SendAsync("ChangeNicknameUser", e);
+        }
     }
     
     // DELETE: api/chatrooms/current
-    [HttpDelete("chatrooms/current")]
-    public IActionResult DeleteUser([FromQuery] DeleteChatroomRequest deleteUserRequest)
+    public async Task DeleteUser([FromQuery] DeleteChatroomRequest deleteUserRequest)
     {
-        var e = _mediator.Send(deleteUserRequest);
-        return !e.Result ? StatusCode(503) : Ok(e.Result);
+        var e = await _mediator.Send(deleteUserRequest);
+        if (!e)
+        {
+            await _hubContext.Clients.All.SendAsync("DeleteUserDenied", deleteUserRequest);
+        }
+        else
+        {
+            await _hubContext.Clients.All.SendAsync("DeleteUser", e);
+        }
     }
 }

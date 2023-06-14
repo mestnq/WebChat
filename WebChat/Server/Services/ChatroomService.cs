@@ -53,6 +53,12 @@ public class ChatroomService : IService
         return null;
     }
 
+    public async Task<IReadOnlyCollection<User?>?> GetUsersInChatroom(long chatroomId)
+    {
+        var e = await _chatroomRepository.GetChatroom(chatroomId);
+        return e?.Users.ToList();
+    }
+
     public async Task<Chatroom?> UpdateChatroom(Chatroom chatroom)
     {
         return await _chatroomRepository.UpdateChatroom(chatroom);
