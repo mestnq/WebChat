@@ -7,8 +7,6 @@ namespace WebChat.Server.Controllers;
 
 public class ChatroomController : Hub
 {
-    // обновление названия чата)
-    
     private readonly IMediator _mediator;
     private readonly IHubContext<ChatroomController> _hubContext;
 

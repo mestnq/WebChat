@@ -11,7 +11,7 @@ public class MessageController : Hub
 {
     private readonly IMediator _mediator;
     private readonly IHubContext<MessageController> _hubContext;
-    private static List<Tuple<long, string>> _clientProxies = new List<Tuple<long, string>>();
+    private static List<Tuple<long, string?>> _clientProxies = new List<Tuple<long, string?>>();
 
     public MessageController(IMediator mediator, IHubContext<MessageController> hubContext)
     {
@@ -21,7 +21,7 @@ public class MessageController : Hub
     
     public override Task OnDisconnectedAsync(Exception? exception)
     {
-        Tuple<long, string> deleted = new Tuple<long, string>(0, null);
+        Tuple<long, string?> deleted = new Tuple<long, string?>(0, null);
         foreach (var proxy in _clientProxies)
         {
             if (proxy.Item2 == Context.ConnectionId)
@@ -62,7 +62,7 @@ public class MessageController : Hub
             List<string> clientProxy = new List<string>();
             foreach (var key in _clientProxies)
             {
-                if (users.Users.Any(u => u.Id == key.Item1))
+                if (key.Item2 is not null && users.Users.Any(u => u.Id == key.Item1))
                 {
                     clientProxy.Add(key.Item2);
                 }
